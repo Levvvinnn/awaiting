@@ -69,15 +69,22 @@ These are non-negotiable. If a task seems to need breaking one, stop and ask.
 
 ## Commands
 
+Node 22 (>= 22.12, see `.nvmrc`) and pnpm 10.34.9 (pinned via `packageManager`; run `corepack enable` once if `pnpm` isn't on your PATH).
+
 ```sh
 pnpm install
-pnpm test     # all workspace tests
-pnpm lint     # all workspace lint/typecheck
-pnpm --filter @awaiting/core test       # core only (adjust to actual package name)
-pnpm --filter desktop dev               # run the desktop app (adjust to actual script)
-```
+pnpm test     # Vitest in every package + desktop smoke:sqlite (better-sqlite3 under Electron)
+pnpm lint     # ESLint (0 warnings) + Prettier check + lint-guard self-test + tsc in every package
+pnpm format   # Prettier --write
+pnpm dev      # = pnpm --filter desktop dev
 
-Update this section once the scripts exist.
+pnpm --filter @awaiting/core test
+pnpm --filter @awaiting/cli test
+pnpm --filter desktop dev              # run the desktop app (main + avatar windows)
+pnpm --filter desktop smoke:sqlite     # open an in-memory SQLite DB under Electron's runtime
+pnpm --filter desktop smoke:app        # build + launch the real app, check both windows, exit
+pnpm --filter desktop rebuild:native   # fallback only: rebuild better-sqlite3 for Electron (needs a native toolchain)
+```
 
 ## Conventions
 

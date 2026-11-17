@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - packages/*
+  - hooks
+savePrefix: ''
+# electron 44.x has no install script (its binary downloads lazily on first require('electron'),
+# i.e. during `pnpm test`'s smoke:sqlite). Kept so a future Electron postinstall is allowed.
+onlyBuiltDependencies:
+  - electron
+# better-sqlite3 13.x ships N-API prebuilds inside the package; pnpm would otherwise run
+# node-gyp (needs a native toolchain). Fallback: `pnpm --filter desktop rebuild:native`.
+ignoredBuiltDependencies:
+  - better-sqlite3
