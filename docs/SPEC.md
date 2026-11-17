@@ -29,7 +29,16 @@ awaiting only observes. Its hooks never block anything, change anything or retur
 | `StopFailure` | The turn ends because of an API error | `error`, `error_details?` | **Turn end (error)** |
 | `SessionEnd` | The session ends (`reason`) | `reason` | Close any open turn |
 
-Every event carries these common fields: `session_id`, `prompt_id`, `transcript_path`, `cwd`, `permission_mode`, `hook_event_name`, `agent_id?` and `agent_type?`.
+Every event carries these common fields: `session_id`, `transcript_path`, `cwd`, `hook_event_name`, `prompt_id?` (absent until the first user input), `permission_mode?` (not on every event), `effort?` (an object with `level`), `agent_id?` and `agent_type?`.
+
+More fields the docs list that this table leaves out (checked 2026-11-17, M1 plan §10):
+- `tool_input` is also on `PostToolUseFailure` and `PermissionRequest`.
+- `PermissionRequest` also has `permission_suggestions?` and `mcp_server?`.
+- `StopFailure` also has `last_assistant_message?`.
+- `Stop` and `SubagentStop` also have `session_crons`.
+- `SubagentStop` also has `last_assistant_message`, `agent_transcript_path` and `stop_hook_active`.
+
+awaiting stores sanitized summaries only.
 
 The `Notification` types we act on are `permission_prompt`, `idle_prompt`, `elicitation_dialog`, `elicitation_url_dialog` and `agent_needs_input`. We store the others but don't act on them.
 
@@ -42,6 +51,15 @@ The `Notification` types we act on are `permission_prompt`, `idle_prompt`, `elic
 - **Plain-text stdout becomes context for Claude** on `UserPromptSubmit` and `SessionStart`, and other events parse stdout as JSON. This is why the hook writes nothing to stdout.
 - **`SessionEnd` has a 1.5 s total budget by default.** The hook's ~500 ms limit fits inside it.
 - **Hook config shape:** `hooks.<Event>[].hooks[]` with `type: "command"`. `timeout` is in seconds. `async: true` runs the hook in the background without blocking Claude Code. `args` runs `command` without a shell, which avoids quoting problems with Windows paths. The M1 plan must confirm which of these options our minimum supported Claude Code version honors.
+- **`timeout` is not enforced for `async: true` hooks.** The hook's own deadline is the only limit. Async hooks are also killed when a `-p` run exits, so awaiting keeps `Stop`, `StopFailure` and `SessionEnd` synchronous.
+- **A per-hook `timeout` on `SessionEnd` raises the shared 1.5 s budget**, so ours must stay at ≤ 1 s.
+- **On Windows without Git Bash**, a failing shell-form `PreToolUse` or `PermissionRequest` hook can block the tool call. This is why awaiting uses exec form (`command: "node"`, `args: [script]`).
+- **`UserPromptSubmit` doesn't only mean the user typed something.** It also fires for scheduled tasks and `/loop`, background-subagent reports, cross-session messages and Code Mode output.
+- **`Notification` timing and meaning:**
+  - `permission_prompt` fires only after about 6 s.
+  - `idle_prompt` fires about 60 s after the response.
+  - `agent_needs_input` also covers agent view, teammate setup and the auto-mode billing notice, so it doesn't always mean "this session needs you". M2 and M4 must account for this.
+- **awaiting needs Node ≥ 20 on PATH.** Claude Code's native installer doesn't install Node.
 
 ---
 
@@ -102,8 +120,9 @@ These restate `CLAUDE.md`'s hard rules as testable criteria.
   - Reads stdin JSON, adds `received_at` (epoch ms, taken in the hook), and POSTs it to `http://127.0.0.1:<port>/events`.
   - Has a hard timeout of ~500 ms.
   - Exits 0 and writes nothing to stdout, ever.
-  - Finds the port in a small file written by the app, for example `~/.awaiting/port`, falling back to a default. A missing file means it exits 0 at once.
-  - Optionally checks a shared token from the same file, so other local processes can't inject events.
+  - Finds the port in a small file written by the app (`~/.awaiting/server.json`, overridable with `AWAITING_HOME`). There is no fallback port. A missing file means it exits 0 at once.
+  - Sends a shared token from the same file. The token is required, so other local processes can't inject events.
+  - Drops `tool_response` before sending (it is the largest field and is unused).
 - **Local HTTP server** (main process)
   - Accepts `POST /events`, validates against a per-event schema and strips the raw prompt (H3).
   - Responds quickly and does the work after replying.
@@ -143,7 +162,7 @@ These restate `CLAUDE.md`'s hard rules as testable criteria.
   - install then uninstall
 
   The user's hooks are untouched in every case. Install twice yields no duplicates. Install then uninstall gives back JSON equal in meaning to the original. Malformed input is never overwritten.
-- [ ] A backup file is created before every write.
+- [ ] A backup file is created before every write to an existing settings file.
 - [ ] `doctor` exits non-zero when something is wrong and prints what to fix.
 - [ ] Manual check with a real Claude Code session: the debug view shows `SessionStart`, `UserPromptSubmit`, tool events, `Stop` and `SessionEnd` live. Claude Code shows no hook errors and no added latency.
 - [ ] Turn boundaries are correct for: a normal turn, a turn ended by an API error (`StopFailure`), and a user-interrupted turn (no `Stop`).

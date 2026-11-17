@@ -47,3 +47,18 @@ jobs:
       - name: App smoke (Windows/macOS)
         if: runner.os != 'Linux'
         run: pnpm --filter desktop smoke:app
+
+  # The hook runs on the user's own `node` (>= 20), with no dependencies and no install step.
+  hook-compat:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --test hooks/test/hook.test.js

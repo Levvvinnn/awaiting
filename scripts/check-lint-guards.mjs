@@ -8,6 +8,7 @@ const RULES = new Set([
   'no-restricted-globals',
   'no-restricted-properties',
   'no-restricted-syntax',
+  'no-console',
 ]);
 
 /** @type {{ name: string; filePath: string; code: string; expectError: boolean }[]} */
@@ -187,6 +188,31 @@ const cases = [
     filePath: 'apps/desktop/src/main/__guard__.mjs',
     code: "import { app } from 'electron';\nexport default app;\n",
     expectError: false,
+  },
+  // M1: hook dependency/output rules, CLI and server boundaries.
+  {
+    name: 'hooks: require non-builtin',
+    filePath: 'hooks/__guard__.js',
+    code: "const lp = require('left-pad');\nmodule.exports = lp;\n",
+    expectError: true,
+  },
+  {
+    name: 'hooks: console.log',
+    filePath: 'hooks/__guard__.js',
+    code: 'console.log(1);\n',
+    expectError: true,
+  },
+  {
+    name: 'cli: node:http outside doctor probe',
+    filePath: 'packages/cli/src/__guard__.mjs',
+    code: "import http from 'node:http';\nexport default http;\n",
+    expectError: true,
+  },
+  {
+    name: 'server: node:https still banned',
+    filePath: 'apps/desktop/src/main/server/__guard__.mjs',
+    code: "import https from 'node:https';\nexport default https;\n",
+    expectError: true,
   },
   {
     name: 'server: node:http allowed',

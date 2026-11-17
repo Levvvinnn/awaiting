@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { avatarWindowOptions, mainWindowOptions, secureWebPreferences } from './options';
+import { MAIN_WINDOW_ARG } from '../../shared/bridge';
 
 const PRELOAD = '/app/out/preload/index.js';
 
@@ -56,5 +57,12 @@ describe('main window', () => {
     expect(windows.main.transparent).not.toBe(true);
     expect(windows.main.skipTaskbar).not.toBe(true);
     expect(windows.main.alwaysOnTop).not.toBe(true);
+  });
+});
+
+describe('debug API marker', () => {
+  it('is passed to the main window only', () => {
+    expect(windows.main.webPreferences?.additionalArguments).toEqual([MAIN_WINDOW_ARG]);
+    expect(windows.avatar.webPreferences?.additionalArguments).toBeUndefined();
   });
 });

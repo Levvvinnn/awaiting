@@ -32,6 +32,8 @@ export default defineConfig({
   },
   preload: {
     build: {
+      // A sandboxed preload can only require('electron'): bundle the shared validators' core deps.
+      externalizeDeps: { exclude: ['@awaiting/core'] },
       rolldownOptions: {
         input: { index: resolve(__dirname, 'src/preload/index.ts') },
         // A sandboxed preload cannot be ESM.

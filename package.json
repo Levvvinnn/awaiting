@@ -9,7 +9,8 @@
     "lint": "eslint . --max-warnings 0 && prettier --check . && node scripts/check-lint-guards.mjs && pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "format": "prettier --write .",
-    "dev": "pnpm --filter desktop dev"
+    "dev": "pnpm --filter desktop dev",
+    "awaiting": "node packages/cli/dist/awaiting.cjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

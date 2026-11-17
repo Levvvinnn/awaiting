@@ -139,12 +139,41 @@ export default tseslint.config(
       'no-restricted-syntax': ['error', ...networkSyntax, ...socketSyntax],
     },
   },
-  // http/net allowed (loopback server + hook, M1)
+  // http/net allowed (loopback server + hook + doctor's loopback probe, M1)
   {
-    files: ['apps/desktop/src/main/server/**', 'hooks/**'],
+    files: [
+      'apps/desktop/src/main/server/**',
+      'packages/cli/src/doctor/probe.ts',
+      'packages/cli/test/fake-app-server.ts',
+      'hooks/**',
+    ],
     rules: {
       'no-restricted-imports': ['error', { paths: networkPaths, patterns: networkPatterns }],
       'no-restricted-syntax': ['error', ...networkSyntax],
+    },
+  },
+  // Hook: zero dependencies (rule 1), runs on the user's Node >= 20 (ES2022), never writes output.
+  {
+    files: ['hooks/**/*.js'],
+    languageOptions: { ecmaVersion: 2022 },
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...networkSyntax,
+        {
+          selector: "CallExpression[callee.name='require'][arguments.0.value!=/^node:/]",
+          message:
+            'hooks/ has zero dependencies (CLAUDE.md rule 1): only require("node:<builtin>").',
+        },
+      ],
+    },
+  },
+  {
+    // The hook must write nothing to stdout/stderr (rule 1). Tests may log.
+    files: ['hooks/**/*.js'],
+    ignores: ['hooks/test/**'],
+    rules: {
+      'no-console': ['error'],
     },
   },
   // Core purity (also applies to core tests)

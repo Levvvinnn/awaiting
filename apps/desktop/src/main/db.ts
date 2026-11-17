@@ -1,7 +1,10 @@
 import Database from 'better-sqlite3';
 
-/** Open a SQLite database. M0 uses ':memory:' only; file paths and migrations are M1. */
-export function openDatabase(path: ':memory:'): Database.Database {
+/**
+ * Open a raw SQLite connection (a file path or ':memory:'). No pragmas, no migrations: use
+ * `openStore` from ./store/open for the app database.
+ */
+export function openDatabase(path: string): Database.Database {
   return new Database(path);
 }
 

@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "log-prompt.sh" },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["/somewhere/awaiting-hook.js"],
+            "async": true,
+            "timeout": 5
+          },
+          { "type": "command", "command": "after.sh" }
+        ]
+      }
+    ],
+    "CustomEvent": [
+      {
+        "hooks": [{ "type": "command", "command": "node", "args": ["/somewhere/awaiting-hook.js"] }]
+      }
+    ]
+  }
+}

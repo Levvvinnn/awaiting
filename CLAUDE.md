@@ -84,7 +84,15 @@ pnpm --filter desktop dev              # run the desktop app (main + avatar wind
 pnpm --filter desktop smoke:sqlite     # open an in-memory SQLite DB under Electron's runtime
 pnpm --filter desktop smoke:app        # build + launch the real app, check both windows, exit
 pnpm --filter desktop rebuild:native   # fallback only: rebuild better-sqlite3 for Electron (needs a native toolchain)
+
+node --test hooks/test/hook.test.js    # hook tests (also run by `pnpm test`; CI runs them on Node 20 too)
+pnpm --filter @awaiting/cli build      # bundle the CLI to packages/cli/dist/awaiting.cjs
+pnpm awaiting install   --settings <path> [--dry-run] [--hook-path <file>] [--shell-form]
+pnpm awaiting uninstall --settings <path> [--purge]
+pnpm awaiting doctor    --settings <path>
 ```
+
+Always pass `--settings` pointing at a copy or temp file during development. Set `AWAITING_HOME` to a temp dir so the app and the hook don't use the real `~/.awaiting`.
 
 ## Conventions
 

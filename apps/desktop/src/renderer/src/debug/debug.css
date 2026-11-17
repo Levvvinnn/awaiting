@@ -1,0 +1,156 @@
+.debug-view {
+  display: grid;
+  gap: 1rem;
+  max-width: 72rem;
+}
+
+.debug-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+}
+
+.debug-status-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+}
+
+.debug-status-list div {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.debug-status-list dt {
+  font-weight: 600;
+}
+
+.debug-status-list dt::after {
+  content: ':';
+}
+
+.debug-status-list dd {
+  margin: 0;
+}
+
+.debug-mock {
+  font-style: italic;
+}
+
+.debug-error {
+  color: #b00020;
+}
+
+.debug-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.debug-filters fieldset {
+  margin: 0;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 6px;
+}
+
+.debug-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.15rem 0.75rem;
+  max-width: 48rem;
+}
+
+.debug-checks label {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.debug-check-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.debug-field {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.9rem;
+}
+
+.debug-panel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+}
+
+.debug-count {
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.debug-empty {
+  opacity: 0.7;
+}
+
+.debug-scroll {
+  max-height: 22rem;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border-radius: 6px;
+}
+
+.debug-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.debug-table th,
+.debug-table td {
+  padding: 0.25rem 0.6rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.debug-table thead th {
+  position: sticky;
+  top: 0;
+  background: Canvas;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.debug-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, currentColor 5%, transparent);
+}
+
+.debug-mono {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+.debug-status {
+  padding: 0 0.35rem;
+  border-radius: 4px;
+}
+
+.debug-status-running {
+  background: color-mix(in srgb, #1e88e5 25%, transparent);
+}
+
+.debug-status-done {
+  background: color-mix(in srgb, #43a047 25%, transparent);
+}
+
+.debug-status-error {
+  background: color-mix(in srgb, #e53935 25%, transparent);
+}
+
+.debug-status-interrupted {
+  background: color-mix(in srgb, #fb8c00 25%, transparent);
+}
+
+.debug-view :focus-visible {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}

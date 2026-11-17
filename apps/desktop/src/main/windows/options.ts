@@ -1,6 +1,7 @@
 // Pure window option builders. Electron is imported as types only, so this module is
 // unit-testable under plain-Node Vitest.
 import type { BrowserWindowConstructorOptions, WebPreferences } from 'electron';
+import { MAIN_WINDOW_ARG } from '../../shared/bridge';
 
 /** Security-critical webPreferences shared by every window. */
 export function secureWebPreferences(preloadPath: string): WebPreferences {
@@ -29,7 +30,11 @@ export function mainWindowOptions(preloadPath: string): BrowserWindowConstructor
     show: false,
     title: 'awaiting',
     autoHideMenuBar: true,
-    webPreferences: secureWebPreferences(preloadPath),
+    webPreferences: {
+      ...secureWebPreferences(preloadPath),
+      // Tells the shared preload to expose the debug API (main window only).
+      additionalArguments: [MAIN_WINDOW_ARG],
+    },
   };
 }
 

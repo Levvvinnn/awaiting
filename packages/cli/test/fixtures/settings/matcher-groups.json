@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Edit|Write", "hooks": [{ "type": "command", "command": "lint.sh" }] },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "guard.sh" },
+          { "type": "http", "url": "http://127.0.0.1:9999/hook" }
+        ]
+      }
+    ],
+    "Notification": [
+      { "matcher": "permission_prompt", "hooks": [{ "type": "command", "command": "alert.sh" }] },
+      { "matcher": "idle_prompt", "hooks": [{ "type": "command", "command": "idle.sh" }] }
+    ],
+    "PostToolUse": []
+  }
+}

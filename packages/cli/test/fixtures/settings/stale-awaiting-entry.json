@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "guard.sh" }] },
+      {
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["/old/repo/hooks/awaiting-hook.js"] }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"C:/Users/old/.awaiting/hook/Awaiting-Hook.js\"" }
+        ]
+      },
+      {
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["/old/repo/hooks/awaiting-hook.js"] }
+        ]
+      }
+    ]
+  }
+}
